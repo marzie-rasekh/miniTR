@@ -6,11 +6,9 @@ dashboardPage(
   dashboardHeader(title = "MiniPOP"),
   dashboardSidebar(
     sidebarMenu(
-      textInput(inputId = "search",
-                width = '90%', 
-                label = "Search:", 
-                value = "chr7:156101194-156101584", 
-                placeholder = "Search by position (hg38), gene, or TR id."),
+      selectInput(inputId = "brosweTR", 
+                  label = "Select TR id", 
+                  choices = c()),
       menuItem("Query", tabName = "query", icon = icon("dashboard")),
       menuItem("Genome Browser", tabName = "browser", icon = icon("dashboard")),
       menuItem("Genotypes", tabName = "genotype", icon = icon("exclamation-circle")),
@@ -25,19 +23,50 @@ dashboardPage(
   ),
   dashboardBody(
     tabItems(
-      # First tab content
+      tabItem(tabName = "query",
+              fluidRow(
+                box(
+                  width = 2, 
+                  title = "Query the minisatellites",
+                  height = "100%",
+                  selectInput(inputId = "criteria", 
+                              label = "Query by ", 
+                              choices = c("TRDB id", 
+                                          "position",
+                                          "gene"), 
+                              selected = "position"),
+                  conditionalPanel(condition = "output.queryby == 1",
+                                   textInput(inputId = "query_trid", 
+                                             label = "TR id", 
+                                             value = "")),
+                  conditionalPanel(condition = "output.queryby == 2",
+                                   textInput(inputId = "query_position", 
+                                             label = "(hg38)", 
+                                             value = "")),
+                  conditionalPanel(condition = "output.queryby == 3",
+                                   textInput(inputId = "query_gene", 
+                                             label = "gene name", 
+                                             value = ""),
+                                   numericInput(inputId = "query_upstream", 
+                                                label = "Upstream", 
+                                                value = 0, 
+                                                step = 1000),
+                                   numericInput(inputId = "query_upstream", 
+                                                label = "Downstream", 
+                                                value = 0, 
+                                                step = 1000))
+                  
+                ),
+                box(width = 10, title = "Results",
+                    dataTableOutput(outputId = "selected_trs"))
+              )
+      ),
       tabItem(tabName = "browser",
               fluidRow(
                 box(
                   width = 12,
                   height = '100%',
-                  h3("Results for TRs:"),
-                  sliderInput("windowsize", 
-                              "Windowsize:", 
-                              min = 10,
-                              max = 200,
-                              value = 50,
-                              step = 5),
+                  h3("Genome Browser"),
                   htmlOutput("browser")
                 )
               )
