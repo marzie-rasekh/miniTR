@@ -20,7 +20,7 @@ The available functions are:
 There is an online bioinformatics tools available:
 * Wrap-around alignment to find copy number of a given pattern in one or more sequences.
 
-Authors: Marzie Eslami Rasekh (PhD candidate, Boston University), Micheal P. Griffen (A boring place who no one knows what they do.)
+Authors: Marzie Eslami Rasekh (PhD candidate, Boston University), Michael P. Griffin (A boring place who no one knows what they do.)
 
 License: Do what ever you want. 
 
