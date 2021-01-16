@@ -1,7 +1,6 @@
 ## ui.R ##
 library(shinydashboard)
 library(shinyLP)
-library(dqshiny)
 library(shinyWidgets)
 
 
