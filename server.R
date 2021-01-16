@@ -4,122 +4,150 @@ library(ggplot2)
 library(data.table)
 library(dplyr)
 library(stringr)
-
-library(rtracklayer)
+library(shiny)
+#library(bedr)
+library(ggplot2)
+#library(rtracklayer)
+require(ggseqlogo)
+source("tools/wrapAroundAlign.R")
 
 # Define server logic required to generate and plot a random distribution
 shinyServer(function(input, output, session) {
+  server_values = reactiveValues()
+  
   # queryby is used for conditional inputs in the input
-  queryby <- reactive({
-    switch(input$criteria,
-           "TRDB id" = 1,
-           "position" = 2,
-           "gene" = 3,
-           4)
-  })
-  output$queryby <- reactive({
-    queryby()
-  })
-  # tr_list keeps all the queried tr ids
-  tr_list <- reactive({
+  observeEvent(input$search, {
+    # TR characteristics
+    copy_limit = input$query_copynumber
+    pattern_limit = input$query_patternlength
+    array_limit = input$query_arraysize
+    # position
+    position = input$query_position
+    # by gene
+    gene = input$query_gene
+    upstream = input$query_upstream
+    downstream = input$query_upstream
+    # make trs and update the browseTR selectinput
     refset = fread(file = "data/refset.tsv")
-    criteria = queryby()
-    if (criteria == 1 ) {
-      #by TR id
-      trs = str_trim(string = input$query_trid, side = "both")
-    } else if (criteria == 2) {
-      c = ""
-      s = -1
-      e = -1
-      # by hg38 position
-      ##### TODO: move to tools
-      position = input$query_position
-      print(position)
-      if(str_detect(position, "chr[1-22|X|Y|M]:[0-9]+-[0-9]+")) {
-        # chrX:1000-2000
-        c   = str_extract(position, "chr[1-22|X|Y|M]")
-        s = str_extract(position, ":[0-9]+")
-        s = substring(text = s, first = 2)
-        e   = str_extract(position, "-[0-9]+")
-        e   = substring(text = e, first = 2)
-      } else if (str_detect(position, "[1-22|X|Y|M]:[0-9]+-[0-9]+")) {
-        # X:1000-2000
-        c   = str_extract(position, "[1-22|X|Y|M]:")
-        c   = paste0("chr", 
-                      substring(text = c, first = 1, last = str_length(string = c)-1))
-        s = str_extract(position, ":[0-9]+")
-        s = substring(text = s, first = 2)
-        e   = str_extract(position, "-[0-9]+")
-        e   = substring(text = e, first = 2)
-      } else if (str_detect(position, "chr[1-22|X|Y|M]\t[0-9]+\t[0-9]+")) {
-        # X:1000-2000
-        array   = strsplit(position, "\t")[[1]]
-        c = array[1]
-        s = as.numeric(array[2])
-        e   = as.numeric(array[3])
-      } else if (str_detect(position, "[1-22|X|Y|M]\t[0-9]+\t[0-9]+")) {
-        # X:1000-2000
-        array   = strsplit(position, "\t")[[1]]
-        c   = paste0("chr", array[1])
-        s = as.numeric(array[2])
-        e   = as.numeric(array[3])
-      } else if (str_detect(position, "[1-22|X|Y|M]")) {
-        # X
-        c   = str_extract(position, "[1-22|X|Y|M]")
-        c   = paste0("chr", c)
-        s = -1
-        e = -1
+    idx = rep(T, nrow(refset))
+    if(input$by_copynumber) {
+      idx = idx & 
+        refset$copy_number >= input$query_copynumber[1] &
+        refset$copy_number <= input$query_copynumber[2]
+    }
+    if(input$by_patternlength) {
+      idx = idx & 
+        refset$pattern >= input$query_patternlength[1] &
+        refset$pattern <= input$query_patternlength[2]
+    }
+    if(input$by_arraysize) {
+      idx = idx & 
+        refset$pattern >= input$query_arraysize[1] &
+        refset$pattern <= input$query_arraysize[2]
+    }
+    # by position
+    if(input$by_position) {
+      idx = idx & refset$chr == input$query_chr
+      if (input$query_position[1] > 0) {
+        idx = idx & refset$start >= input$query_position[1]
       }
-       else {
-         # error # TODO
-         print("error")
-       }
-      print(c(c, s, e))
-      ##### 
-      if (s == -1) {
-        trs = refset[chr==c]$TRid
-      } else {
-        trs = refset[chr == c & 
-                ((start <= s & end >= e) |
-                 (start >= s & start <= e) | 
-                 (end >= s & end <= e))]$TRid
+      if (input$query_position[2] > 0) {
+        idx = idx & refset$end <= input$query_position[2]
       }
     }
-    print(paste("Selected", length(trs), "TRs."))
-    as.character(trs)
-  })
-  output$tr_list <- reactive({
-    tr_list()
+    # by gene
+    if(input$by_gene) {
+      gencode = fread("data/gencode.v34.basic.annotation.bed")[annotation == "gene" &
+                                                               name == input$query_gene]
+      if(nrow(gencode) == 0) {
+        showNotification(ui = "Gene not found", 
+                         type = "error",
+                         closeButton = TRUE)
+        return(c())
+      }
+      for (i in 1:nrow(gencode)) {
+        gene = gencode[eval(i)]
+        idx = idx & 
+          refset$chr == gene$chr
+          refset$end >= gene$start & 
+          refset$start <= gene$end
+      }
+    }
+    
+    server_values$trs = as.character(refset[idx,]$TRid)
+    updateSelectInput(session, 
+                      inputId = "brosweTR", 
+                      choices = server_values$trs)
+    server_values$trs
   })
   
   output$browser <- renderUI({
-    trs = tr_list()
-    if(length(trs) > 0) {
-      refset = fread("data/refset.tsv")[TRid == input$brosweTR]
-      print(input$brosweTR)
-      position = paste(refset$chr, ":", refset$start, "-", refset$end)
-      list(tags$a(href=paste0("http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=", position), 
-                  position), 
-           tags$iframe(src = paste0("https://genome.ucsc.edu/cgi-bin/hgRenderTracks?db=hg38&position=", 
-                                    position, 
-                                    "&hgt.customText=http://mzrasekh.com/refset.bed"), 
-                             height=800, 
-                             width="100%"))
+    data = system(paste("grep 182168805", #input$brosweTR, 
+                 "data/refset_full.tsv"), intern = T)
+    if (data == "") {
+      showNotification(ui = "The selected TR was not in the reference set", 
+                       type = "error",
+                       closeButton = TRUE)
+      return(NULL)
     }
+    data = str_split(string = data, pattern = "\t")[[1]]
+    
+    position = data[2]
+    
+    list(tags$a(href=paste0("http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=", position), 
+                position), 
+         tags$iframe(src = paste0("https://genome.ucsc.edu/cgi-bin/hgRenderTracks?db=hg38&position=", 
+                                  position, 
+                                  "&hgt.customText=http://mzrasekh.com/refset.bed"), 
+                           height=800, 
+                           width="100%"))
     
   })
   
   output$selected_trs <- renderDataTable({
     refset = fread("data/refset.tsv")
-    trs = tr_list()
-    print(paste("selected_trs:", length(trs)))
+    if(!"trs" %in% names(server_values))
+    {
+      server_values$trs = c()
+    } 
+    trs = server_values$trs
+    
     if(length(trs) > 0) {
-      updateSelectInput(session, inputId = "brosweTR", choices = trs)
-      refset[TRid %in% trs]
-    } else {
-      refset
+      print(paste("selected_trs:", length(trs)))
+        refset[TRid %in% trs]
+     } else {
+        refset
     }
   })
-  outputOptions(output, "queryby", suspendWhenHidden = FALSE) 
-  outputOptions(output, "tr_list", suspendWhenHidden = FALSE) 
+  
+  # the fancy display of the motif
+  output$pattern_logo <- renderPlot({
+    print(input$brosweTR)
+    if(input$brosweTR == "") {
+      showNotification(ui = "Choose one TR to show motif alignment", 
+                       type = "error",
+                       closeButton = TRUE)
+      return(NULL)
+    }
+    data = system(paste("grep", input$brosweTR, 
+                        "data/refset_full.tsv"), intern = T)
+    if (data == "") {
+      showNotification(ui = "The selected TR was not in the reference set", 
+                       type = "error",
+                       closeButton = TRUE)
+      return(NULL)
+    }
+    data = str_split(string = data, pattern = "\t")[[1]]
+    #FlankingRight1000 = data[6]
+    #FlankingLeft1000 = data[7]
+    ArraySequence = data[9]
+    PatternSequence = data[8]
+    alignment = wrapAroundAlign(pattern = PatternSequence, 
+                                sequence = ArraySequence)
+    print(length(alignment$alignment))
+      ggplot() + 
+        geom_logo(data = alignment$alignment , method = "prob") +
+        theme_logo()
+  })
+
 })
