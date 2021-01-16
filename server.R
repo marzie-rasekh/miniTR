@@ -5,9 +5,7 @@ library(data.table)
 library(dplyr)
 library(stringr)
 library(shiny)
-#library(bedr)
 library(ggplot2)
-#library(rtracklayer)
 require(ggseqlogo)
 source("tools/wrapAroundAlign.R")
 
@@ -138,8 +136,6 @@ shinyServer(function(input, output, session) {
       return(NULL)
     }
     data = str_split(string = data, pattern = "\t")[[1]]
-    #FlankingRight1000 = data[6]
-    #FlankingLeft1000 = data[7]
     ArraySequence = data[9]
     PatternSequence = data[8]
     alignment = wrapAroundAlign(pattern = PatternSequence, 
