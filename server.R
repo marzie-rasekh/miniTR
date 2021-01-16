@@ -82,7 +82,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$browser <- renderUI({
-    data = system(paste("grep 182168805", #input$brosweTR, 
+    data = system(paste("grep ", input$brosweTR, 
                  "data/refset_full.tsv"), intern = T)
     if (data == "") {
       showNotification(ui = "The selected TR was not in the reference set", 
