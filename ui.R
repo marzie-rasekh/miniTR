@@ -99,7 +99,7 @@ dashboardPage(
   ),
   dashboardBody(
     selectInput(
-      inputId = "brosweTR",
+      inputId = "browseTR",
       label = "Select TR id",
       choices = c()
     ),
