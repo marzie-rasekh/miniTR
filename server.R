@@ -5,9 +5,7 @@ library(data.table)
 library(dplyr)
 library(stringr)
 library(shiny)
-#library(bedr)
 library(ggplot2)
-#library(rtracklayer)
 require(ggseqlogo)
 source("tools/wrapAroundAlign.R")
 
@@ -76,13 +74,13 @@ shinyServer(function(input, output, session) {
     
     server_values$trs = as.character(refset[idx,]$TRid)
     updateSelectInput(session, 
-                      inputId = "brosweTR", 
+                      inputId = "browseTR", 
                       choices = server_values$trs)
     server_values$trs
   })
   
   output$browser <- renderUI({
-    data = system(paste("grep 182168805", #input$brosweTR, 
+    data = system(paste("grep ", input$browseTR, 
                  "data/refset_full.tsv"), intern = T)
     if (data == "") {
       showNotification(ui = "The selected TR was not in the reference set", 
@@ -122,14 +120,14 @@ shinyServer(function(input, output, session) {
   
   # the fancy display of the motif
   output$pattern_logo <- renderPlot({
-    print(input$brosweTR)
-    if(input$brosweTR == "") {
+    print(input$browseTR)
+    if(input$browseTR == "") {
       showNotification(ui = "Choose one TR to show motif alignment", 
                        type = "error",
                        closeButton = TRUE)
       return(NULL)
     }
-    data = system(paste("grep", input$brosweTR, 
+    data = system(paste("grep", input$browseTR, 
                         "data/refset_full.tsv"), intern = T)
     if (data == "") {
       showNotification(ui = "The selected TR was not in the reference set", 
@@ -138,8 +136,6 @@ shinyServer(function(input, output, session) {
       return(NULL)
     }
     data = str_split(string = data, pattern = "\t")[[1]]
-    #FlankingRight1000 = data[6]
-    #FlankingLeft1000 = data[7]
     ArraySequence = data[9]
     PatternSequence = data[8]
     alignment = wrapAroundAlign(pattern = PatternSequence, 
