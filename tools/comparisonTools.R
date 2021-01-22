@@ -13,20 +13,20 @@ delimit <- function(alignment, consensus) {
     
     # Beyond here we check if the current comparison is consistent with
     # the preceding comparison.
-    isCurrentMatch <- function() { consensus[index] == alignment[index] }
-    isCurrentMismatch <- function() { !isCurrentMatch() }
+    isCurrentMatch <- consensus[index] == alignment[index]
+    isCurrentMismatch <- !isCurrentMatch
 
     if (isMatch) {
       isPreviousMatch <- consensus[index - 1] == alignment[index - 1];
-      isConsecutiveMatch <- function() { isPreviousMatch && isCurrentMatch() }
+      isConsecutiveMatch <- isPreviousMatch && isCurrentMatch
       
-      return(isConsecutiveMatch())
+      return(isConsecutiveMatch)
     }
     
     isPreviousComparisonSame <-  alignment[index] == alignment[index - 1]
-    isConsecutiveMismatch <- function() { isPreviousComparisonSame && isCurrentMismatch() }
+    isConsecutiveMismatch <- isPreviousComparisonSame && isCurrentMismatch
     
-    return(isConsecutiveMismatch())
+    return(isConsecutiveMismatch)
   }
     
   limit <- min(length(consensus), length(alignment));
@@ -51,7 +51,6 @@ defineSegments <- function(endpoints) {
   regions <- list()
   start <- 1
 
-  
   for(idx in 1:length(endpoints)) {
     end <- endpoints[idx]
     regions[[idx]] <- list(start = start, end = end)
