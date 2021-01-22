@@ -3,7 +3,6 @@ library(shinydashboard)
 library(shinyLP)
 library(shinyWidgets)
 
-
 dashboardPage(
   dashboardHeader(title = "MiniPOP"),
   dashboardSidebar(
@@ -98,6 +97,9 @@ dashboardPage(
     )
   ),
   dashboardBody(
+    tags$head(
+      tags$link(rel = "stylesheet", type = "text/css", href = "viz-styles.css")
+    ),
     selectInput(
       inputId = "browseTR",
       label = "Select TR id",
