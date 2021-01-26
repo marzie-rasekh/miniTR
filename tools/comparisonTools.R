@@ -85,18 +85,20 @@ rowHtml <- function(comparisonRegions, alignment, consensus) {
   return(div(spans, class = 'alignment-row'))
 }
 
-columnHtml <- function(innerHtml, className) {
+columnHtml <- function(innerHtml, className = "sequence-column") {
   return(div(innerHtml, class = className))
 }
 
-placeholder <- function() {
-  print('calling the placeholder method')
-  consensus <- 'AAAACCCCGGGGTTTTAAA'
-  alignment <- 'CCCCACTGACTGACTGAAC'
-  endpoints <- delimit(alignment, consensus)
-  comparisonRegions <- defineSegments(endpoints)
-  innerHtml <- rowHtml(comparisonRegions, alignment, consensus)
-  column <- columnHtml(innerHtml, "sequence-column")
+placeholder <- function(alignments) {
+  # TODO: use a consensus function
+  consensus <- 'CTCATGTGGGCCTCCCTCTGCACACGTATATCTGACATCCTCCCATGTC'
   
-  return(column)
+  buildRows <- function(alignment) {
+    endpoints <- delimit(alignment, consensus)
+    comparisonRegions <- defineSegments(endpoints)
+
+    return(rowHtml(comparisonRegions, alignment, consensus))
+  }
+
+  return(columnHtml(lapply(alignments, buildRows)))
 }
