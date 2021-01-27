@@ -142,7 +142,6 @@ shinyServer(function(input, output, session) {
     alignment = wrapAroundAlign(pattern = PatternSequence, 
                                 sequence = ArraySequence)
     print(length(alignment$alignment))
-    print(alignment$alignment)
       ggplot() + 
         geom_logo(data = alignment$alignment , method = "prob") +
         theme_logo()
@@ -164,7 +163,8 @@ shinyServer(function(input, output, session) {
      alignment = wrapAroundAlign(pattern = PatternSequence, 
                                  sequence = ArraySequence)
 
-     placeholder(alignment$alignment)
+     wraparoundHtml(alignment$alignment)
   })
 })
+
 
