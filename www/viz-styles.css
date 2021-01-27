@@ -1,6 +1,7 @@
 .sequence-column {
   padding: 0px;
   font-family: 'Courier New', Courier, monospace;
+  font-size: x-large;
 }
 
 .sequence-column span {
@@ -9,6 +10,7 @@
 
 .alignment-row {
   display: flex;
+  justify-content: center;
 }
 
 .match {
