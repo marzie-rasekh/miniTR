@@ -1,8 +1,5 @@
 library(htmltools)
-
-# TODO: Consider moving shared functions to a common folder if they
-# are to be used across multiple files.
-splitToVector <- function(s) { unlist(strsplit(s, '')) }
+source("tools/helpers.R")
 
 delimit <- function(alignment, consensus) {
   alignment <- splitToVector(alignment)
