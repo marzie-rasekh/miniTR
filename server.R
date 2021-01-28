@@ -8,6 +8,7 @@ library(shiny)
 library(ggplot2)
 require(ggseqlogo)
 source("tools/wrapAroundAlign.R")
+source("tools/comparisonTools.R")
 
 # Define server logic required to generate and plot a random distribution
 shinyServer(function(input, output, session) {
@@ -145,5 +146,25 @@ shinyServer(function(input, output, session) {
         geom_logo(data = alignment$alignment , method = "prob") +
         theme_logo()
   })
+  
+   output$query_js_wraparound_display <- renderUI({
+     # TODO: consider ways to consolidate code here and in the immediately preceding method.
+     data = system(paste("grep", input$browseTR, 
+                         "data/refset_full.tsv"), intern = T)
+     if (data == "") {
+       showNotification(ui = "The selected TR was not in the reference set", 
+                        type = "error",
+                        closeButton = TRUE)
+       return(NULL)
+     }
+     data = str_split(string = data, pattern = "\t")[[1]]
+     ArraySequence = data[9]
+     PatternSequence = data[8]
+     alignment = wrapAroundAlign(pattern = PatternSequence, 
+                                 sequence = ArraySequence)
 
+     wraparoundHtml(alignment$alignment)
+  })
 })
+
+
