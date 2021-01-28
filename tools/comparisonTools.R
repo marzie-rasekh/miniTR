@@ -1,7 +1,7 @@
 library(htmltools)
 source("tools/helpers.R")
 
-delimit <- function(alignment, consensus) {
+delineate <- function(alignment, consensus) {
   alignment <- splitToVector(alignment)
   consensus <- splitToVector(consensus)
 
@@ -134,7 +134,7 @@ wraparoundHtml <- function(alignments) {
   consensus <- consensusBuilder(alignments)
   
   buildRows <- function(alignment) {
-    endpoints <- delimit(alignment, consensus)
+    endpoints <- delineate(alignment, consensus)
     comparisonRegions <- defineSegments(endpoints)
 
     return(rowHtml(comparisonRegions, alignment, consensus))
