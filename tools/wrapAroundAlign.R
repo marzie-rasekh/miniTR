@@ -40,25 +40,25 @@ wrapAroundAlign <- function(pattern,
   for (i in 2:N) {
     for (j in 2:M ) {
       if (j == 2) {
-        diagnol = align[i-1,M] + 
+        diagonal = align[i-1,M] + 
           ifelse(pattern[j] == sequence[i], MATCH, MISMATCH);
         up = align[i-1,j] + GAP;
         left = align[i-1,M] + GAP;
       } else {
-        diagnol = align[i-1,j-1] + 
+        diagonal = align[i-1,j-1] + 
           ifelse(pattern[j] == sequence[i], MATCH, MISMATCH);
         up = align[i-1,j] + GAP;
         left = align[i,j-1] + GAP;
       }
-      if (diagnol <= 0 && up <= 0 && left <= 0) {
+      if (diagonal <= 0 && up <= 0 && left <= 0) {
         path[i,j] = "stop";
         align[i,j] = 0;
       }
-      else if (diagnol > left) {
-        if (diagnol > up) {
-          # the path came from diagnol
-          path[i,j] = 'diagnol';
-          align[i,j] = diagnol;
+      else if (diagonal > left) {
+        if (diagonal > up) {
+          # the path came from diagonal
+          path[i,j] = 'diagonal';
+          align[i,j] = diagonal;
         } else {
           path[i,j] = 'up';
           align[i,j] = up;
@@ -98,7 +98,7 @@ wrapAroundAlign <- function(pattern,
     } else if (action == "left") {
       repeat_unit = paste0("-", repeat_unit)
       j = j - 1
-    } else if (action == "diagnol") {
+    } else if (action == "diagonal") {
       repeat_unit = paste0(sequence[i], repeat_unit)
       i = i - 1
       j = j - 1
