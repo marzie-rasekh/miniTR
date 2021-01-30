@@ -89,7 +89,7 @@ columnHtml <- function(innerHtml, className = "sequence-column") {
   return(div(innerHtml, class = className))
 }
 
-wraparoundHtml <- function(alignments) {
+alignmentsVisualization <- function(alignments) {
   consensus <- consensusBuilder(alignments)
   
   buildRows <- function(alignment) {
