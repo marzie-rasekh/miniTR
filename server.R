@@ -163,7 +163,7 @@ shinyServer(function(input, output, session) {
      alignment = wrapAroundAlign(pattern = PatternSequence, 
                                  sequence = ArraySequence)
 
-     wraparoundHtml(alignment$alignment)
+     alignmentsVisualization(alignment$alignment)
   })
 })
 
