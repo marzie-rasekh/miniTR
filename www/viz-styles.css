@@ -13,6 +13,11 @@
   display: flex;
 }
 
+.alignment-row:first-of-type {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .match {
   background-color:black;
 }
