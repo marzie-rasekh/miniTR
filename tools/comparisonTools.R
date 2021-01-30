@@ -99,5 +99,8 @@ wraparoundHtml <- function(alignments) {
     return(rowHtml(comparisonRegions, alignment, consensus))
   }
 
-  return(columnHtml(lapply(alignments, buildRows)))
+  return(
+    div(
+      columnHtml(lapply(alignments, buildRows)),
+      class = 'sequence-column-container'))
 }

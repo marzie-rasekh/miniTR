@@ -4,13 +4,13 @@
   font-size: x-large;
 }
 
-.sequence-column span {
-  padding: 0px;
+.sequence-column-container {
+  display: flex;
+  justify-content: center;
 }
 
 .alignment-row {
   display: flex;
-  justify-content: center;
 }
 
 .match {
