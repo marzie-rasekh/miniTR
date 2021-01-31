@@ -36,7 +36,7 @@ consensusBuilder <- function(alignments) {
     results <- c(results, tally(votes))
   }
   
-  consensus <- concatToVector(results)
+  consensus <- joinToString(results)
   
   return(consensus)
 }
