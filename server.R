@@ -97,7 +97,7 @@ shinyServer(function(input, output, session) {
       
       updateSelectInput(session, 
                         inputId = "browseTR", 
-                        choices = server_values$TRs) 
+                        choices = server_values$TRs$TRid) 
     } else {
       showNotification(ui = "No TRs found with given criteria.", 
                        type = "error",
@@ -143,7 +143,7 @@ shinyServer(function(input, output, session) {
     ids = input$selected_trs_rows_selected
     print(ids)
     if (length(ids > 0)) {
-      if(is.null(server_values$TRid)) {
+      if(is.null(server_values$TRs)) {
         tr = refset = fread("data/refset.tsv")$TRid[ids]
         updateSelectInput(session, 
                           inputId = "browseTR", 
