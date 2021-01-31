@@ -25,7 +25,6 @@ wrapAroundAlign <- function(pattern,
                             MISMATCH = -5, 
                             GAP = -7) {
   require(stringr)
-  source("tools/consensusBuilder.R")
   pattern.sequence = pattern
   pattern = str_split(string = (paste0(" ", toupper(pattern))), pattern = "")[[1]]
   sequence = str_split(string = paste0(" ", toupper(sequence)), pattern = "")[[1]]
