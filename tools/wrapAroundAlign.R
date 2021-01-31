@@ -25,6 +25,7 @@ wrapAroundAlign <- function(pattern,
                             MISMATCH = -5, 
                             GAP = -7) {
   require(stringr)
+  source("tools/consensusBuilder.R")
   pattern = str_split(string = (paste0(" ", toupper(pattern))), pattern = "")[[1]]
   sequence = str_split(string = paste0(" ", toupper(sequence)), pattern = "")[[1]]
   
@@ -137,6 +138,7 @@ wrapAroundAlign <- function(pattern,
   
   list(copy_number = copy_number,
        max_score = max_score, 
+       consensus = consensusBuilder(alignment),
        alignment = alignment,
        left_flank = str_trim(string = paste0(sequence[1:(min_i)],
                            collapse = "")),

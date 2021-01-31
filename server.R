@@ -149,7 +149,7 @@ shinyServer(function(input, output, session) {
   
    output$query_js_wraparound_display <- renderUI({
      # TODO: consider ways to consolidate code here and in the immediately preceding method.
-     data = system(paste("grep", input$browseTR, 
+     data = system(paste("grep", "182168807", #input$browseTR, 
                          "data/refset_full.tsv"), intern = T)
      if (data == "") {
        showNotification(ui = "The selected TR was not in the reference set", 
@@ -160,10 +160,20 @@ shinyServer(function(input, output, session) {
      data = str_split(string = data, pattern = "\t")[[1]]
      ArraySequence = data[9]
      PatternSequence = data[8]
-     alignment = wrapAroundAlign(pattern = PatternSequence, 
+     LeftFlank = data[7]
+     RightFlank = data[6]
+     tandem_repeat = wrapAroundAlign(pattern = PatternSequence, 
                                  sequence = ArraySequence)
+     LeftFlank = paste0(LeftFlank, tandem_repeat$left_flank)
+     tandem_repeat$left_flank = substr(x = LeftFlank, 
+                                   start = str_length(LeftFlank)-50, 
+                                   stop = str_length(LeftFlank))
+     tandem_repeat$right_flank = substr(x = paste0(tandem_repeat$right_flank, RightFlank), 
+                                   start = 1, 
+                                   stop = 50)
 
-     alignmentsVisualization(alignment$alignment)
+     alignmentsVisualization(tandem_repeat$alignment, 
+                             tandem_repeat$consensus)
   })
 })
 
