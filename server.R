@@ -209,7 +209,7 @@ shinyServer(function(input, output, session) {
     
     plotOutput("pattern_logo", 
                width = 17*str_length(tandem_repeat$consensus),
-               height = 3*str_length(tandem_repeat$consensus))
+               height = 150)
   })
    output$query_js_wraparound_display <- renderUI({
      if ("tandem_repeat" %in% names(server_values)) {
