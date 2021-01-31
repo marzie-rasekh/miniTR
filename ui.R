@@ -5,7 +5,7 @@ library(shinyWidgets)
 
 dashboardPage(
   dashboardHeader(title = "MiniPOP"),
-  dashboardSidebar(
+  dashboardSidebar(width=200,
     sidebarMenu(
       checkboxInput(
         inputId = "by_copynumber",
@@ -117,8 +117,13 @@ dashboardPage(
         tabPanel(
           id = "motif",
           title = "Motif Display",
-          plotOutput(outputId = "pattern_logo", height = "100px"),
-          htmlOutput(outputId = "query_js_wraparound_display")
+          div(style = 'overflow-x: scroll; margin-left: 0;',
+            uiOutput(outputId = "motif_plot"),
+            #plotOutput(outputId = "pattern_logo", height = "100px"),
+            div(style = 'margin-left: 80px;',
+              htmlOutput(outputId = "query_js_wraparound_display")
+            )
+          )
         ),
         tabPanel(
           id = "browser",

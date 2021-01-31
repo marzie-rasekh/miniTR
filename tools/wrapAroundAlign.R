@@ -25,6 +25,7 @@ wrapAroundAlign <- function(pattern,
                             MISMATCH = -5, 
                             GAP = -7) {
   require(stringr)
+  pattern.sequence = pattern
   pattern = str_split(string = (paste0(" ", toupper(pattern))), pattern = "")[[1]]
   sequence = str_split(string = paste0(" ", toupper(sequence)), pattern = "")[[1]]
   
@@ -110,15 +111,23 @@ wrapAroundAlign <- function(pattern,
     }
   } 
   min_i = i
-  
+  indel_at = copy_number - indel_at
   alignment = str_split(string = str_trim(repeat_unit, "both"), pattern = " ")[[1]]
   N = length(alignment)
+  consensus = pattern.sequence
   if(length(indel) > 0) {
-    for (i in 1:length(indel)) {
-      idx = setdiff(1:N, N - indel_at[i])
-      alignment[idx] = 
-        paste(substring(text = alignment[idx], first = 1, last = indel[i] - 1), 
-              substring(text = alignment[idx], first = indel[i] ), sep = "-")
+    for (i in unique(sort(indel))) {
+      idx = setdiff(1:N, indel_at[which(indel == i)])
+      for (j in idx) {
+        alignment[j] = 
+          paste(substring(text = alignment[j], first = 1, last = i - 1), 
+                substring(text = alignment[j], first = i ), sep = "-")
+      }
+      char_count = table(sapply(X = alignment, FUN = function(str){substring(text = str, first = i, last = i)}))
+      char = names(char_count[char_count == max(char_count[names(char_count) != "-"])])
+      consensus = paste(substring(text = consensus, first = 1, last = i - 1),
+                        char,
+                        substring(text = consensus, first = i ), sep = "")
     }
   }
   
@@ -133,14 +142,19 @@ wrapAroundAlign <- function(pattern,
     alignment[N] = paste0(alignment[N], padding)
   }
   
-  list(copy_number = copy_number,
-       max_score = max_score, 
-       alignment = alignment,
-       left_flank = str_trim(string = paste0(sequence[1:(min_i)],
-                           collapse = "")),
-       right_flank = paste0(sequence[-(1:max_i)],
-                            collapse = ""),
-       start = min_i,
-       end = max_i)
+  
+  
+  list(
+      pattern = pattern.sequence,
+      copy_number = copy_number,
+      max_score = max_score, 
+      consensus = consensus,
+      alignment = alignment,
+      left_flank = str_trim(string = paste0(sequence[1:(min_i)],
+                            collapse = "")),
+      right_flank = paste0(sequence[-(1:max_i)],
+                          collapse = ""),
+      start = min_i,
+      end = max_i)
 }
 

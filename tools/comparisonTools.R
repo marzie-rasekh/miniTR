@@ -89,9 +89,8 @@ columnHtml <- function(innerHtml, className = "sequence-column") {
   return(div(innerHtml, class = className))
 }
 
-alignmentsVisualization <- function(alignments) {
-  consensus <- consensusBuilder(alignments)
-  
+alignmentsVisualization <- function(alignments, consensus) {
+
   buildRows <- function(alignment) {
     endpoints <- delineate(alignment, consensus)
     comparisonRegions <- defineSegments(endpoints)
