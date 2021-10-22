@@ -8,89 +8,104 @@ dashboardPage(
   dashboardSidebar(width=200,
     sidebarMenu(
       checkboxInput(
-        inputId = "by_copynumber",
-        label = "Query by copy number",
+        inputId = "by_TRid",
+        label = "Query by TR id",
         value = FALSE
       ),
       conditionalPanel(
-        condition = "input.by_copynumber == true",
-        numericRangeInput(
-          inputId = "query_copynumber",
-          label = "limit",
-          separator = " to ",
-          value = c(1.75, 630)
-        )
-      ),
-      checkboxInput(
-        inputId = "by_patternlength",
-        label = "Query by pattern length",
-        value = FALSE
-      ),
-      conditionalPanel(
-        condition = "input.by_patternlength == true",
-        numericRangeInput(
-          inputId = "query_patternlength",
-          label = "from",
-          separator = " to ",
-          value = c(7, 1994)
-        )
-      ),
-      checkboxInput(
-        inputId = "by_arraysize",
-        label = "Query by array size",
-        value = FALSE
-      ),
-      conditionalPanel(
-        condition = "input.by_arraysize == true",
-        numericRangeInput(
-          inputId = "query_arraysize",
-          label = "from",
-          separator = " to ",
-          value = c(13, 108907)
-        )
-      ),
-      checkboxInput(
-        inputId = "by_position",
-        label = "Query by position (hg38)",
-        value = FALSE
-      ),
-      conditionalPanel(
-        condition = "input.by_position == true",
-        selectInput(
-          inputId = "query_chr",
-          label = "chr",
-          choices = paste0("chr", c(1:22, "X", "Y"))
-        ),
-        numericRangeInput(
-          inputId = "query_position",
-          label = "from",
-          separator = " to ",
-          value = c(0, 0)
-        )
-      ),
-      checkboxInput(
-        inputId = "by_gene",
-        label = "Query by gene overlap",
-        value = FALSE
-      ),
-      conditionalPanel(
-        condition = "input.by_gene == true",
+        condition = "input.by_TRid == true",
         textInput(
-          inputId = "query_gene",
-          label = "gene name",
-          value = ""
+          inputId = "query_TRid", 
+          label = "TRid"
+        )
+      ),
+      conditionalPanel(
+        condition = "input.by_TRid == false",
+        checkboxInput(
+          inputId = "by_copynumber",
+          label = "Query by copy number",
+          value = FALSE
         ),
-        numericInput(
-          inputId = "query_upstream",
-          label = "Upstream",
-          value = 0,
-          step = 1000
+        conditionalPanel(
+          condition = "input.by_copynumber == true",
+          numericRangeInput(
+            inputId = "query_copynumber",
+            label = "limit",
+            separator = " to ",
+            value = c(1.75, 630)
+          )
         ),
-        numericInput(
-          inputId = "query_downstream",
-          label = "Downstream",
-          value = 0,
-          step = 1000
+        checkboxInput(
+          inputId = "by_patternlength",
+          label = "Query by pattern length",
+          value = FALSE
+        ),
+        conditionalPanel(
+          condition = "input.by_patternlength == true",
+          numericRangeInput(
+            inputId = "query_patternlength",
+            label = "from",
+            separator = " to ",
+            value = c(7, 1994)
+          )
+        ),
+        checkboxInput(
+          inputId = "by_arraysize",
+          label = "Query by array size",
+          value = FALSE
+        ),
+        conditionalPanel(
+          condition = "input.by_arraysize == true",
+          numericRangeInput(
+            inputId = "query_arraysize",
+            label = "from",
+            separator = " to ",
+            value = c(13, 108907)
+          )
+        ),
+        checkboxInput(
+          inputId = "by_position",
+          label = "Query by position (hg38)",
+          value = FALSE
+        ),
+        conditionalPanel(
+          condition = "input.by_position == true",
+          selectInput(
+            inputId = "query_chr",
+            label = "chr",
+            choices = paste0("chr", c(1:22, "X", "Y"))
+          ),
+          numericRangeInput(
+            inputId = "query_position",
+            label = "from",
+            separator = " to ",
+            value = c(0, 0)
+          )
+        ),
+        checkboxInput(
+          inputId = "by_gene",
+          label = "Query by gene overlap",
+          value = FALSE
+        ),
+        conditionalPanel(
+          condition = "input.by_gene == true",
+          textInput(
+            inputId = "query_gene",
+            label = "gene name",
+            value = ""
+          ),
+          numericInput(
+            inputId = "query_upstream",
+            label = "Upstream",
+            value = 0,
+            step = 1000
+          ),
+          numericInput(
+            inputId = "query_downstream",
+            label = "Downstream",
+            value = 0,
+            step = 1000
+          )
         )
       ),
       actionButton(inputId = "search", label = "Search")

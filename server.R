@@ -20,11 +20,20 @@ shinyServer(function(input, output, session) {
     # make trs and update the browseTR selectinput
     refset = fread(file = "data/refset.tsv")
     idx = rep(T, nrow(refset))
+    if(input$by_TRid) {
+      print(paste("TRid:", input$query_TRid))
+      idx = (refset$TRid == input$query_TRid)
+      if(idx == 0) {
+        showNotification(ui = "No TRs found with given id.", 
+                         type = "error",
+                         closeButton = TRUE)
+      }
+    }
     if(input$by_copynumber) {
       print(paste("Copy number:", 
-                  input$input$query_copynumber[1],
+                  input$query_copynumber[1],
                   "-",
-                  input$input$query_copynumber[2]))
+                  input$query_copynumber[2]))
       idx = idx & 
         refset$copy_number >= input$query_copynumber[1] &
         refset$copy_number <= input$query_copynumber[2]
@@ -149,6 +158,7 @@ shinyServer(function(input, output, session) {
   })
   # the fancy display of the motif
   output$pattern_logo <- renderPlot({
+    # TODO, make the indels show
     if ("tandem_repeat" %in% names(server_values)) {
       ggplot() + 
         geom_logo(data = server_values$tandem_repeat$alignment , 
@@ -189,6 +199,7 @@ shinyServer(function(input, output, session) {
     tandem_repeat = wrapAroundAlign(pattern = PatternSequence, 
                                     sequence = ArraySequence)
     LeftFlank = paste0(LeftFlank, tandem_repeat$left_flank)
+    tandem_repeat$TRid = data[1]
     tandem_repeat$left_flank = substr(x = LeftFlank, 
                                       start = str_length(LeftFlank)-50, 
                                       stop = str_length(LeftFlank))
