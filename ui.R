@@ -115,11 +115,13 @@ dashboardPage(
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "viz-styles.css")
     ),
+    useShinyjs(),
+    disabled(
     textInput(
       inputId = "browseTR",
-      label = "Select TR id", 
+      label = "TR id", 
       value = ""
-    ),
+    )),
     fluidPage(
       tabBox(
         id = "display",
