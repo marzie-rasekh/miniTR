@@ -84,11 +84,14 @@ shinyServer(function(input, output, session) {
       }
       idx = rep(T, nrow(refset))
       for (i in 1:nrow(gencode)) {
+        upstream = input$query_upstream
+        downstream = input$query_downstream
+        print(upstream)
         gene = gencode[eval(i)]
         idx = idx & 
           (refset$chr == gene$chr &
-          refset$start >= gene$start &
-          refset$end <= gene$end)
+          refset$start >= gene$start - ifelse(is.null(upstream), 0, upstream) &
+          refset$end <= gene$end + ifelse(is.null(upstream), 0, upstream))
       }
     }
     
