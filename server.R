@@ -17,15 +17,6 @@ shinyServer(function(input, output, session) {
   
   # queryby is used for conditional inputs in the input
   observeEvent(input$search, {
-    # TR characteristics
-    copy_limit = input$query_copynumber
-    pattern_limit = input$query_patternlength
-    array_limit = input$query_arraysize
-    # position
-    position = input$query_position
-    # by gene
-    gene = input$query_gene
-    downstream = input$query_upstream
     # make trs and update the browseTR selectinput
     refset = fread(file = "data/refset.tsv")
     idx = rep(T, nrow(refset))
@@ -83,15 +74,12 @@ shinyServer(function(input, output, session) {
         return(c())
       }
       idx = rep(T, nrow(refset))
-      print(sum(idx))
       for (i in 1:nrow(gencode)) {
         gene = gencode[eval(i)]
-        print(gene)
         idx = idx & 
           (refset$chr == gene$chr &
           refset$start >= gene$start &
           refset$end <= gene$end)
-        print(sum(idx))
       }
     }
     
