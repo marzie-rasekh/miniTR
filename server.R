@@ -82,22 +82,23 @@ shinyServer(function(input, output, session) {
                          closeButton = TRUE)
         return(c())
       }
+      idx = rep(T, nrow(refset))
+      print(sum(idx))
       for (i in 1:nrow(gencode)) {
         gene = gencode[eval(i)]
+        print(gene)
         idx = idx & 
-          refset$chr == gene$chr
-          refset$end >= gene$start & 
-          refset$start <= gene$end
+          (refset$chr == gene$chr &
+          refset$start >= gene$start &
+          refset$end <= gene$end)
+        print(sum(idx))
       }
     }
     
     if(sum(idx) > 0) {
       print(paste("Total TRs ", sum(idx)))
       server_values$TRs =refset[idx,]
-      
-      updateSelectInput(session, 
-                        inputId = "browseTR", 
-                        choices = server_values$TRs$TRid) 
+
     } else {
       showNotification(ui = "No TRs found with given criteria.", 
                        type = "error",
@@ -107,8 +108,11 @@ shinyServer(function(input, output, session) {
   })
   
   output$browser <- renderUI({
-    data = system(paste("grep ", input$browseTR, 
-                 "data/refset_full.tsv"), intern = T)
+    #data = system2(paste("grep ", input$browseTR, 
+    #             "data/refset_full.tsv"), intern = T)
+    # if windows 
+    data = system(command = paste('bash -c "grep', input$browseTR, ' data/refset_full.tsv"'), intern = T)
+
     if (data == "") {
       showNotification(ui = "The selected TR was not in the reference set", 
                        type = "error",
@@ -143,18 +147,15 @@ shinyServer(function(input, output, session) {
     ids = input$selected_trs_rows_selected
     print(ids)
     if (length(ids > 0)) {
+      
       if(is.null(server_values$TRs)) {
-        tr = refset = fread("data/refset.tsv")$TRid[ids]
-        updateSelectInput(session, 
-                          inputId = "browseTR", 
-                          choices = tr, 
-                          selected = tr)
-      } else {
-        updateSelectInput(session, 
-                          inputId = "browseTR", 
-                          choices = server_values$TRs$TRid, 
-                          selected = server_values$TRs$TRid[ids])
+        print("server_values$TRs is null")
+        server_values$TRs = refset = fread("data/refset.tsv")
+       
       }
+      updateTextInput(session, 
+                        inputId = "browseTR", 
+                        value = server_values$TRs$TRid[ids[1]])
        
     }
   })
@@ -177,13 +178,15 @@ shinyServer(function(input, output, session) {
   output$motif_plot <- renderUI({
     print(input$browseTR)
     if(input$browseTR == "") {
-      showNotification(ui = "Choose one TR to show motif alignment", 
+      showNotification(ui = "Choose a TR to show motif alignment", 
                        type = "error",
                        closeButton = TRUE)
       return(NULL)
     }
-    data = system(paste("grep", input$browseTR, 
-                        "data/refset_full.tsv"), intern = T)
+    #data = system(paste("grep", input$browseTR, 
+    #                    "data/refset_full.tsv"), intern = T)
+    # if windows
+    data = system(command = paste('bash -c "grep', input$browseTR, ' data/refset_full.tsv"'), intern = T)
     if (data == "") {
       showNotification(ui = "The selected TR was not in the reference set", 
                        type = "error",

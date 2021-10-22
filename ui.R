@@ -59,7 +59,7 @@ dashboardPage(
         selectInput(
           inputId = "query_chr",
           label = "chr",
-          choices = c(1:22, "X", "Y")
+          choices = paste0("chr", c(1:22, "X", "Y"))
         ),
         numericRangeInput(
           inputId = "query_position",
@@ -100,10 +100,10 @@ dashboardPage(
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "viz-styles.css")
     ),
-    selectInput(
+    textInput(
       inputId = "browseTR",
-      label = "Select TR id",
-      choices = c()
+      label = "Select TR id", 
+      value = ""
     ),
     fluidPage(
       tabBox(
